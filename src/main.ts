@@ -49,7 +49,7 @@ async function runTrace(): Promise<void> {
           // Commune manquante → géocodage sans commune renverrait n'importe quoi en France
           voie.geoError = true;
         } else {
-          pt = await geocodeVoie(voie.rue, voie.commune, voie.cp);
+          pt = await geocodeVoie(voie.rue, voie.commune, voie.cp, voie.num);
         }
         if (pt) {
           coordsMap.set(voie.id, pt);

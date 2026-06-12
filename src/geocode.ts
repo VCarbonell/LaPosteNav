@@ -8,16 +8,30 @@ export interface LatLng {
   lng: number;
 }
 
+/** Extrait le dernier entier "raisonnable" du champ numéros (ex. "14-12-10-8 · (Garage)" → 8). */
+function lastHouseNumber(num: string): number | null {
+  const hits = num.match(/\b(\d+)\b/g);
+  if (!hits) return null;
+  for (let i = hits.length - 1; i >= 0; i--) {
+    const n = parseInt(hits[i], 10);
+    if (n > 0 && n < 2000) return n;
+  }
+  return null;
+}
+
 export async function geocodeVoie(
   rue: string,
   commune: string,
   cp: string,
+  num = '',
 ): Promise<LatLng | null> {
-  const cacheKey = `${CACHE_PREFIX}${rue}|${commune}|${cp}`;
+  const cacheKey = `${CACHE_PREFIX}${rue}|${commune}|${cp}|${num}`;
   const cached = await get<LatLng>(cacheKey);
   if (cached) return cached;
 
-  const query = [rue, commune, cp].filter(Boolean).join(', ');
+  const houseNum = lastHouseNumber(num);
+  const streetPart = houseNum != null ? `${houseNum} ${rue}` : rue;
+  const query = [streetPart, commune, cp].filter(Boolean).join(', ');
   if (!query.trim()) return null;
 
   const url =
