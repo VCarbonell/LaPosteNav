@@ -587,3 +587,164 @@ header h1 {
 .maplibregl-ctrl-bottom-right {
   bottom: env(safe-area-inset-bottom, 0);
 }
+
+/* ===== MAP WRAP ===== */
+#map-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== MAP BOTTOM BAR ===== */
+.map-bottom-bar {
+  position: absolute;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  left: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.map-bottom-bar button {
+  pointer-events: all;
+  flex: 1;
+  height: 48px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+}
+
+#btn-retrace {
+  background: #fff;
+  color: #1a1a1a;
+  flex: 0 0 auto;
+  width: 48px; /* icon-only */
+  font-size: 20px;
+  flex: none;
+  min-width: 60px;
+}
+
+#btn-retrace:active {
+  background: #f0f0f0;
+}
+
+#btn-nav {
+  background: #FFCD00;
+  color: #1a1a1a;
+  flex: 1;
+}
+
+#btn-nav:active {
+  background: #e6b800;
+}
+
+#btn-nav.nav-active {
+  background: #ef4444;
+  color: #fff;
+}
+
+#btn-nav.nav-active:active {
+  background: #dc2626;
+}
+
+/* ===== ME ARROW (overlay centré, fixe) ===== */
+.me-arrow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+}
+
+/* ===== BTN FOLLOW (recentrer) ===== */
+.btn-follow {
+  position: absolute;
+  right: 14px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 76px);
+  z-index: 10;
+  background: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  touch-action: manipulation;
+  cursor: pointer;
+  color: #1a1a1a;
+}
+
+.btn-follow:active {
+  background: #f0f0f0;
+}
+
+/* ===== SETTINGS MODAL CONTENT ===== */
+.settings-body {
+  padding: 16px 20px 8px;
+}
+
+.settings-label {
+  display: block;
+  margin-bottom: 24px;
+}
+
+.settings-label-title {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+#pitch-slider {
+  width: 100%;
+  accent-color: #FFCD00;
+  height: 6px;
+}
+
+.settings-range-hints {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+
+.settings-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+  margin-bottom: 12px;
+}
+
+.settings-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  cursor: pointer;
+  min-height: 44px;
+  border-radius: 8px;
+  padding: 0 4px;
+}
+
+.settings-radio-label:active {
+  background: #f5f5f5;
+}
+
+.settings-radio-label input[type="radio"] {
+  width: 22px;
+  height: 22px;
+  accent-color: #333;
+  flex-shrink: 0;
+  cursor: pointer;
+}

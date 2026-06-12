@@ -2,7 +2,15 @@ import { loadState, reset, state } from './state';
 import { renderList, addVoie, initModal, initMoveModal, markGeoErrors } from './list';
 import { geocodeVoie, type LatLng } from './geocode';
 import { computeRoute } from './route';
-import { initMap, showRoute } from './map';
+import { initMap, showRoute, getMap } from './map';
+import {
+  startNavigation,
+  stopNavigation,
+  recenter,
+  setOnTrackingChange,
+  isNavActive,
+} from './nav';
+import { getPitch, setPitch, getMode, setMode, type TransportMode } from './settings';
 import './style.css';
 
 // ---- view switching ----
@@ -46,7 +54,6 @@ async function runTrace(): Promise<void> {
         if (voie.lat != null && voie.lng != null) {
           pt = { lat: voie.lat, lng: voie.lng };
         } else if (!voie.commune.trim()) {
-          // Commune manquante → géocodage sans commune renverrait n'importe quoi en France
           voie.geoError = true;
         } else {
           pt = await geocodeVoie(voie.rue, voie.commune, voie.cp, voie.num);
@@ -80,7 +87,8 @@ async function runTrace(): Promise<void> {
   }
 
   setLoading(true, 'Calcul de l\'itinéraire…');
-  const routeCoords = await computeRoute(waypoints, (segDone, segTotal) => {
+  const mode = getMode();
+  const routeCoords = await computeRoute(waypoints, mode, (segDone, segTotal) => {
     setLoading(true, `Itinéraire… (${segDone} / ${segTotal} segments)`);
   });
 
@@ -108,6 +116,80 @@ async function runTrace(): Promise<void> {
     : `Itinéraire (${waypoints.length} voies)`;
 }
 
+// ---- navigation mode ----
+
+const meArrow = () => document.getElementById('me-arrow')!;
+const btnFollow = () => document.getElementById('btn-follow')!;
+const btnNav = () => document.getElementById('btn-nav')!;
+const btnRetrace = () => document.getElementById('btn-retrace')!;
+
+function setNavUI(active: boolean): void {
+  btnNav().textContent = active ? '■ Arrêter' : '▶ Conduire';
+  btnNav().classList.toggle('nav-active', active);
+  btnRetrace().classList.toggle('hidden', active);
+  if (!active) {
+    meArrow().classList.add('hidden');
+    btnFollow().classList.add('hidden');
+  }
+}
+
+async function toggleNav(): Promise<void> {
+  if (isNavActive()) {
+    stopNavigation();
+    setNavUI(false);
+    return;
+  }
+
+  const map = getMap();
+  if (!map) return;
+
+  setNavUI(true);
+  await startNavigation(map, getPitch());
+}
+
+// ---- settings modal ----
+
+function initSettings(): void {
+  const modal = document.getElementById('settings-modal')!;
+  const slider = document.getElementById('pitch-slider') as HTMLInputElement;
+  const pitchVal = document.getElementById('pitch-value')!;
+
+  // Initialise les valeurs depuis localStorage
+  const savedPitch = getPitch();
+  slider.value = String(savedPitch);
+  pitchVal.textContent = String(savedPitch);
+
+  const savedMode = getMode();
+  const modeRadio = document.querySelector(
+    `input[name="transport-mode"][value="${savedMode}"]`,
+  ) as HTMLInputElement | null;
+  if (modeRadio) modeRadio.checked = true;
+
+  document.getElementById('btn-settings')!.addEventListener('click', () => {
+    modal.classList.remove('hidden');
+  });
+
+  document.getElementById('settings-close')!.addEventListener('click', () => {
+    modal.classList.add('hidden');
+  });
+
+  document.getElementById('settings-overlay')!.addEventListener('click', () => {
+    modal.classList.add('hidden');
+  });
+
+  slider.addEventListener('input', () => {
+    const v = Number(slider.value);
+    pitchVal.textContent = String(v);
+    setPitch(v);
+  });
+
+  document.querySelectorAll<HTMLInputElement>('input[name="transport-mode"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      setMode(radio.value as TransportMode);
+    });
+  });
+}
+
 // ---- init ----
 
 async function init(): Promise<void> {
@@ -115,6 +197,7 @@ async function init(): Promise<void> {
   renderList();
   initModal();
   initMoveModal();
+  initSettings();
 
   document.getElementById('btn-add')!.addEventListener('click', addVoie);
 
@@ -127,11 +210,29 @@ async function init(): Promise<void> {
 
   document.getElementById('btn-trace')!.addEventListener('click', () => runTrace());
 
-  document.getElementById('btn-back')!.addEventListener('click', () => showView('list'));
+  document.getElementById('btn-back')!.addEventListener('click', () => {
+    if (isNavActive()) {
+      stopNavigation();
+      setNavUI(false);
+    }
+    showView('list');
+  });
 
   document.getElementById('btn-retrace')!.addEventListener('click', () => {
     showView('list');
     setTimeout(() => runTrace(), 50);
+  });
+
+  document.getElementById('btn-nav')!.addEventListener('click', () => toggleNav());
+
+  document.getElementById('btn-follow')!.addEventListener('click', () => {
+    recenter();
+  });
+
+  // Met à jour la flèche et le bouton recentrer selon l'état du suivi
+  setOnTrackingChange((active: boolean) => {
+    meArrow().classList.toggle('hidden', !active);
+    btnFollow().classList.toggle('hidden', active);
   });
 }
 

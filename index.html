@@ -31,9 +31,27 @@
         <header class="header-map">
           <button id="btn-back" type="button">← Liste</button>
           <span id="map-title">Itinéraire</span>
-          <button id="btn-retrace" type="button" title="Recalculer l'itinéraire">↺</button>
+          <button id="btn-settings" type="button" title="Réglages">⚙</button>
         </header>
-        <div id="map-container"></div>
+        <div id="map-wrap">
+          <div id="map-container"></div>
+
+          <!-- Flèche "moi" — centrée, visible uniquement en mode nav + suivi actif -->
+          <div id="me-arrow" class="me-arrow hidden" aria-hidden="true">
+            <svg width="36" height="44" viewBox="0 0 36 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 3 L32 40 L18 30 L4 40 Z" fill="#2563eb" stroke="white" stroke-width="3" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <!-- Bouton recentrer — visible en nav quand le suivi est désactivé -->
+          <button id="btn-follow" class="btn-follow hidden" type="button">⊙ Recentrer</button>
+
+          <!-- Barre de boutons bas de carte -->
+          <div class="map-bottom-bar">
+            <button id="btn-retrace" type="button">↺ Recalculer</button>
+            <button id="btn-nav" type="button">▶ Conduire</button>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -75,6 +93,39 @@
         <div class="modal-footer">
           <button id="modal-select-empty" type="button">Sélect. vides</button>
           <button id="modal-apply" type="button">Appliquer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Modal réglages ===== -->
+    <div id="settings-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Réglages">
+      <div class="modal-overlay" id="settings-overlay"></div>
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h2>Réglages</h2>
+          <button id="settings-close" type="button" aria-label="Fermer">✕</button>
+        </div>
+        <div class="modal-body settings-body">
+          <label class="settings-label">
+            <div class="settings-label-title">Inclinaison carte (<span id="pitch-value">50</span>°)</div>
+            <input type="range" id="pitch-slider" min="0" max="60" step="5" value="50" />
+            <div class="settings-range-hints"><span>0° (dessus)</span><span>60° (nav)</span></div>
+          </label>
+          <div class="settings-label-title">Mode de déplacement</div>
+          <div class="settings-radio-group">
+            <label class="settings-radio-label">
+              <input type="radio" name="transport-mode" value="driving-car" checked />
+              Voiture
+            </label>
+            <label class="settings-radio-label">
+              <input type="radio" name="transport-mode" value="cycling-regular" />
+              Vélo
+            </label>
+            <label class="settings-radio-label">
+              <input type="radio" name="transport-mode" value="foot-walking" />
+              À pied
+            </label>
+          </div>
         </div>
       </div>
     </div>

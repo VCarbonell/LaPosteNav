@@ -9,6 +9,10 @@ const STYLE_URL = `https://api.maptiler.com/maps/streets/style.json?key=${MAPTIL
 let map: maplibregl.Map | null = null;
 const markers: maplibregl.Marker[] = [];
 
+export function getMap(): maplibregl.Map | null {
+  return map;
+}
+
 export function initMap(containerId: string): void {
   if (map) return;
 
