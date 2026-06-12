@@ -42,7 +42,7 @@ App perso **mobile** pour suivre une tournée de facteur sur une carte (liste de
 2. Coder + lint + build.
 3. Ouvrir une **Pull Request** vers `main` avec un résumé de ce qui a changé.
 4. Me partager le lien de la PR pour relecture.
-5. Je valide → merge → GitHub Actions déploie automatiquement.
+5. **Merger la PR toi-même** (`gh pr merge --merge --delete-branch`) sans attendre ma validation explicite.
 6. Me partager l'URL GitHub Pages pour test sur mobile.
 
 ### Secrets CI
