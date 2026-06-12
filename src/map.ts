@@ -79,13 +79,40 @@ function addRouteLayers(coordinates: [number, number][]): void {
   });
 }
 
+// Rayon de séparation quand plusieurs voies géocodent au même point (~30 m).
+const SPREAD_DEG = 0.0003;
+
+function spreadPosition(
+  lat: number,
+  lng: number,
+  placed: Array<{ lat: number; lng: number }>,
+): { lat: number; lng: number } {
+  const clashes = placed.filter(
+    p =>
+      Math.abs(p.lat - lat) < SPREAD_DEG * 2 &&
+      Math.abs(p.lng - lng) < SPREAD_DEG * 2,
+  );
+  if (clashes.length === 0) return { lat, lng };
+  // Étaler en cercle (8 positions max avant recouvrement)
+  const angle = (clashes.length * Math.PI * 2) / 8;
+  return {
+    lat: lat + SPREAD_DEG * Math.sin(angle),
+    lng: lng + SPREAD_DEG * Math.cos(angle),
+  };
+}
+
 function addMarkers(voies: Voie[], coords: Map<string, LatLng>): void {
   if (!map) return;
+  const placed: Array<{ lat: number; lng: number }> = [];
   let seq = 1;
+
   for (const voie of voies) {
     if (!voie.inclure) continue;
     const pt = coords.get(voie.id);
     if (!pt) continue;
+
+    const { lat, lng } = spreadPosition(pt.lat, pt.lng, placed);
+    placed.push({ lat, lng });
 
     const el = document.createElement('div');
     el.className = 'map-marker' + (voie.lat ? ' map-marker--manual' : '');
@@ -93,7 +120,7 @@ function addMarkers(voies: Voie[], coords: Map<string, LatLng>): void {
     el.title = voie.rue;
 
     const marker = new maplibregl.Marker({ element: el })
-      .setLngLat([pt.lng, pt.lat])
+      .setLngLat([lng, lat])
       .addTo(map!);
     markers.push(marker);
   }
