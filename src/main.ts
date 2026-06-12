@@ -45,6 +45,9 @@ async function runTrace(): Promise<void> {
         let pt: LatLng | null = null;
         if (voie.lat != null && voie.lng != null) {
           pt = { lat: voie.lat, lng: voie.lng };
+        } else if (!voie.commune.trim()) {
+          // Commune manquante → géocodage sans commune renverrait n'importe quoi en France
+          voie.geoError = true;
         } else {
           pt = await geocodeVoie(voie.rue, voie.commune, voie.cp);
         }
