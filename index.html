@@ -12,18 +12,41 @@
   </head>
   <body>
     <div id="app">
-      <header>
-        <h1>Tournée</h1>
-        <div class="header-actions">
-          <button id="btn-add" type="button">+ Voie</button>
-          <button id="btn-reset" type="button" title="Réinitialiser la liste">↺</button>
-        </div>
-      </header>
 
-      <main id="list-container"></main>
+      <!-- ===== VUE LISTE ===== -->
+      <div id="view-list">
+        <header>
+          <h1>Tournée</h1>
+          <div class="header-actions">
+            <button id="btn-add" type="button">+ Voie</button>
+            <button id="btn-reset" type="button" title="Réinitialiser la liste">↺</button>
+            <button id="btn-trace" type="button" title="Calculer et afficher l'itinéraire">Tracer ▶</button>
+          </div>
+        </header>
+        <main id="list-container"></main>
+      </div>
+
+      <!-- ===== VUE CARTE ===== -->
+      <div id="view-map" class="hidden">
+        <header class="header-map">
+          <button id="btn-back" type="button">← Liste</button>
+          <span id="map-title">Itinéraire</span>
+          <button id="btn-retrace" type="button" title="Recalculer l'itinéraire">↺</button>
+        </header>
+        <div id="map-container"></div>
+      </div>
+
     </div>
 
-    <!-- Modal copie commune/CP -->
+    <!-- ===== Overlay chargement ===== -->
+    <div id="loading-overlay" class="hidden">
+      <div class="loading-box">
+        <div class="loading-spinner"></div>
+        <p id="loading-text">Calcul en cours…</p>
+      </div>
+    </div>
+
+    <!-- ===== Modal copie commune/CP ===== -->
     <div id="copy-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Appliquer commune et CP">
       <div class="modal-overlay" id="modal-overlay"></div>
       <div class="modal-sheet">
