@@ -8,8 +8,10 @@ export interface Voie {
   cp: string;
   num: string;
   inclure: boolean;
-  lat?: number;
+  lat?: number;   // coordonnées GPS manuelles (priment sur le géocodage)
   lng?: number;
+  // champs transients (non persistés) — remis à undefined à chaque calcul
+  geoError?: boolean;
 }
 
 const KEY = 'tournee-v1';

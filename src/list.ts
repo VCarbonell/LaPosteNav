@@ -1,5 +1,5 @@
 import Sortable from 'sortablejs';
-import { state, save, Voie } from './state';
+import { state, save, type Voie } from './state';
 
 let sortable: Sortable | null = null;
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
@@ -79,6 +79,7 @@ function createItem(voie: Voie): HTMLLIElement {
           placeholder="Nom de la rue"
           aria-label="Nom de la rue"
         />
+        <span class="geo-badge${voie.geoError ? ' geo-badge--error' : ''}" aria-label="Erreur de géocodage" title="Adresse introuvable — renseignez la commune/CP ou saisissez des coordonnées GPS">❗</span>
         <label class="inclure-label" title="${voie.inclure ? 'Inclus dans le tracé' : 'Exclu du tracé'}">
           <input type="checkbox" class="inclure-check" ${voie.inclure ? 'checked' : ''} aria-label="Inclure dans le tracé" />
         </label>
@@ -244,6 +245,17 @@ function selectEmptyVoies(): void {
     const voie = state.voies.find(v => v.id === cb.value);
     if (voie && !voie.commune && !voie.cp) cb.checked = true;
   });
+}
+
+// ------- geo error badges -------
+
+export function markGeoErrors(): void {
+  for (const voie of state.voies) {
+    const li = document.querySelector<HTMLElement>(`.voie-item[data-id="${voie.id}"]`);
+    if (!li) continue;
+    const badge = li.querySelector<HTMLElement>('.geo-badge');
+    if (badge) badge.classList.toggle('geo-badge--error', !!voie.geoError);
+  }
 }
 
 function applyCopy(): void {
