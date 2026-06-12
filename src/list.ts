@@ -110,6 +110,7 @@ function createItem(voie: Voie): HTMLLIElement {
           placeholder="Numéros"
           aria-label="Numéros"
         />
+        <button class="btn-move" type="button" aria-label="Déplacer cette voie">↕</button>
         <button class="btn-duplicate" type="button" aria-label="Dupliquer cette voie">⧉</button>
         <button class="btn-delete" type="button" aria-label="Supprimer cette voie">✕</button>
       </div>
@@ -182,6 +183,11 @@ function onListClick(e: Event): void {
   if (target.classList.contains('btn-copy-commune')) {
     const voie = state.voies.find(v => v.id === li.dataset.id);
     if (voie) openCopyModal(voie.commune, voie.cp, voie.id);
+  }
+
+  if (target.classList.contains('btn-move')) {
+    const voie = state.voies.find(v => v.id === li.dataset.id);
+    if (voie) openMoveModal(voie.id);
   }
 }
 
@@ -270,6 +276,75 @@ export function markGeoErrors(): void {
     const badge = li.querySelector<HTMLElement>('.geo-badge');
     if (badge) badge.classList.toggle('geo-badge--error', !!voie.geoError);
   }
+}
+
+// ------- move modal -------
+
+let moveSourceId = '';
+
+export function initMoveModal(): void {
+  document.getElementById('move-modal-close')!.addEventListener('click', closeMoveModal);
+  document.getElementById('move-modal-overlay')!.addEventListener('click', closeMoveModal);
+  document.getElementById('move-modal-apply')!.addEventListener('click', applyMove);
+}
+
+function openMoveModal(sourceId: string): void {
+  moveSourceId = sourceId;
+  const voie = state.voies.find(v => v.id === sourceId)!;
+
+  document.getElementById('move-modal-info')!.textContent =
+    `Déplacer « ${voie.rue || '(sans nom)'} »`;
+
+  const listEl = document.getElementById('move-modal-list')!;
+  listEl.innerHTML = '';
+
+  const mkOption = (value: string, rue: string, loc: string) => {
+    const label = document.createElement('label');
+    label.className = 'modal-voie';
+    label.innerHTML = `
+      <input type="radio" name="move-target" value="${esc(value)}" />
+      <span class="modal-rue">${esc(rue)}</span>
+      <span class="modal-loc">${esc(loc)}</span>
+    `;
+    listEl.appendChild(label);
+  };
+
+  mkOption('__start__', 'Début de la liste', '');
+  for (const v of state.voies) {
+    if (v.id === sourceId) continue;
+    const loc = [v.commune, v.cp].filter(Boolean).join(' ');
+    mkOption(v.id, v.rue || '(sans nom)', loc);
+  }
+
+  document.getElementById('move-modal')!.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMoveModal(): void {
+  document.getElementById('move-modal')!.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function applyMove(): void {
+  const selected = document.querySelector<HTMLInputElement>('#move-modal-list input[type="radio"]:checked');
+  if (!selected) return;
+
+  const targetValue = selected.value;
+  const srcIdx = state.voies.findIndex(v => v.id === moveSourceId);
+  if (srcIdx === -1) return;
+
+  const [moved] = state.voies.splice(srcIdx, 1);
+
+  if (targetValue === '__start__') {
+    state.voies.unshift(moved);
+  } else {
+    const dstIdx = state.voies.findIndex(v => v.id === targetValue);
+    state.voies.splice(dstIdx + 1, 0, moved);
+  }
+
+  save();
+  closeMoveModal();
+  renderList();
 }
 
 function applyCopy(): void {
