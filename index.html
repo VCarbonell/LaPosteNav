@@ -130,6 +130,28 @@
       </div>
     </div>
 
+    <!-- ===== Modal coordonnées GPS ===== -->
+    <div id="gps-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Coordonnées GPS manuelles">
+      <div class="modal-overlay" id="gps-modal-overlay"></div>
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h2>Coordonnées GPS</h2>
+          <button id="gps-modal-close" type="button" aria-label="Fermer">✕</button>
+        </div>
+        <div class="modal-body gps-modal-body">
+          <p id="gps-modal-info" class="gps-modal-info"></p>
+          <div id="gps-current" class="gps-current hidden"></div>
+          <button id="gps-btn-position" type="button" class="gps-btn-full">📍 Ma position actuelle</button>
+          <div class="gps-divider">ou saisir manuellement</div>
+          <input id="gps-input" type="text" class="gps-input" placeholder="48.8566, 2.3522" inputmode="decimal" autocomplete="off" />
+        </div>
+        <div class="modal-footer">
+          <button id="gps-btn-clear" type="button" class="gps-btn-clear hidden">Supprimer coords</button>
+          <button id="gps-btn-save" type="button" class="gps-btn-save">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

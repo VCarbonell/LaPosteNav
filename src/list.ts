@@ -68,6 +68,8 @@ function createItem(voie: Voie): HTMLLIElement {
   li.dataset.id = voie.id;
   li.dataset.inclure = String(voie.inclure);
 
+  const hasCoords = voie.lat != null && voie.lng != null;
+
   li.innerHTML = `
     <div class="drag-handle" aria-label="Déplacer" role="button">⠿</div>
     <div class="voie-body">
@@ -79,6 +81,7 @@ function createItem(voie: Voie): HTMLLIElement {
           placeholder="Nom de la rue"
           aria-label="Nom de la rue"
         />
+        <span class="manual-badge${hasCoords ? ' manual-badge--active' : ''}" aria-label="Coordonnées GPS manuelles" title="Point GPS manuel — prime sur le géocodage">📍</span>
         <span class="geo-badge${voie.geoError ? ' geo-badge--error' : ''}" aria-label="Erreur de géocodage" title="Adresse introuvable — renseignez la commune/CP ou saisissez des coordonnées GPS">❗</span>
         <label class="inclure-label" title="${voie.inclure ? 'Inclus dans le tracé' : 'Exclu du tracé'}">
           <input type="checkbox" class="inclure-check" ${voie.inclure ? 'checked' : ''} aria-label="Inclure dans le tracé" />
@@ -110,6 +113,7 @@ function createItem(voie: Voie): HTMLLIElement {
           placeholder="Numéros"
           aria-label="Numéros"
         />
+        <button class="btn-gps${hasCoords ? ' has-coords' : ''}" type="button" aria-label="Coordonnées GPS manuelles" title="Saisir des coordonnées GPS pour cette voie">📍</button>
         <button class="btn-move" type="button" aria-label="Déplacer cette voie">↕</button>
         <button class="btn-duplicate" type="button" aria-label="Dupliquer cette voie">⧉</button>
         <button class="btn-delete" type="button" aria-label="Supprimer cette voie">✕</button>
@@ -188,6 +192,11 @@ function onListClick(e: Event): void {
   if (target.classList.contains('btn-move')) {
     const voie = state.voies.find(v => v.id === li.dataset.id);
     if (voie) openMoveModal(voie.id);
+  }
+
+  if (target.classList.contains('btn-gps')) {
+    const voie = state.voies.find(v => v.id === li.dataset.id);
+    if (voie) openGpsModal(voie.id);
   }
 }
 
@@ -365,4 +374,126 @@ function applyCopy(): void {
 
   save();
   closeCopyModal();
+}
+
+// ------- GPS modal -------
+
+let gpsSourceId = '';
+
+export function initGpsModal(): void {
+  document.getElementById('gps-modal-close')!.addEventListener('click', closeGpsModal);
+  document.getElementById('gps-modal-overlay')!.addEventListener('click', closeGpsModal);
+  document.getElementById('gps-btn-save')!.addEventListener('click', applyGps);
+  document.getElementById('gps-btn-clear')!.addEventListener('click', clearGps);
+  document.getElementById('gps-btn-position')!.addEventListener('click', capturePosition);
+}
+
+function openGpsModal(voieId: string): void {
+  gpsSourceId = voieId;
+  const voie = state.voies.find(v => v.id === voieId)!;
+
+  document.getElementById('gps-modal-info')!.textContent = voie.rue || '(sans nom)';
+
+  const currentEl = document.getElementById('gps-current')!;
+  const clearBtn = document.getElementById('gps-btn-clear')!;
+  const input = document.getElementById('gps-input') as HTMLInputElement;
+
+  if (voie.lat != null && voie.lng != null) {
+    currentEl.textContent = `${voie.lat.toFixed(6)}, ${voie.lng.toFixed(6)}`;
+    currentEl.classList.remove('hidden');
+    clearBtn.classList.remove('hidden');
+    input.value = `${voie.lat.toFixed(6)}, ${voie.lng.toFixed(6)}`;
+  } else {
+    currentEl.classList.add('hidden');
+    clearBtn.classList.add('hidden');
+    input.value = '';
+  }
+
+  const posBtn = document.getElementById('gps-btn-position') as HTMLButtonElement;
+  posBtn.disabled = false;
+  posBtn.textContent = '📍 Ma position actuelle';
+
+  document.getElementById('gps-modal')!.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeGpsModal(): void {
+  document.getElementById('gps-modal')!.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function capturePosition(): void {
+  if (!navigator.geolocation) {
+    alert('La géolocalisation n\'est pas disponible sur cet appareil.');
+    return;
+  }
+
+  const posBtn = document.getElementById('gps-btn-position') as HTMLButtonElement;
+  posBtn.disabled = true;
+  posBtn.textContent = '⏳ Localisation…';
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      const input = document.getElementById('gps-input') as HTMLInputElement;
+      input.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+      posBtn.disabled = false;
+      posBtn.textContent = '📍 Ma position actuelle';
+    },
+    () => {
+      posBtn.disabled = false;
+      posBtn.textContent = '📍 Ma position actuelle';
+      alert('Impossible d\'obtenir la position. Vérifiez les permissions de géolocalisation.');
+    },
+    { enableHighAccuracy: true, timeout: 10000 },
+  );
+}
+
+function applyGps(): void {
+  const input = (document.getElementById('gps-input') as HTMLInputElement).value.trim();
+  if (!input) { closeGpsModal(); return; }
+
+  const match = input.match(/^(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)$/);
+  if (!match) {
+    alert('Format invalide. Saisissez les coordonnées sous la forme : 48.8566, 2.3522');
+    return;
+  }
+
+  const lat = parseFloat(match[1]);
+  const lng = parseFloat(match[2]);
+
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    alert('Coordonnées hors limites (lat : −90..90, lng : −180..180).');
+    return;
+  }
+
+  const voie = state.voies.find(v => v.id === gpsSourceId);
+  if (!voie) return;
+
+  voie.lat = lat;
+  voie.lng = lng;
+  voie.geoError = undefined;
+  save();
+  updateManualBadge(gpsSourceId, true);
+  closeGpsModal();
+}
+
+function clearGps(): void {
+  const voie = state.voies.find(v => v.id === gpsSourceId);
+  if (!voie) return;
+
+  delete voie.lat;
+  delete voie.lng;
+  save();
+  updateManualBadge(gpsSourceId, false);
+  closeGpsModal();
+}
+
+function updateManualBadge(voieId: string, hasCoords: boolean): void {
+  const li = document.querySelector<HTMLElement>(`.voie-item[data-id="${voieId}"]`);
+  if (!li) return;
+  li.querySelector('.manual-badge')?.classList.toggle('manual-badge--active', hasCoords);
+  const btn = li.querySelector<HTMLElement>('.btn-gps');
+  if (btn) btn.classList.toggle('has-coords', hasCoords);
 }
