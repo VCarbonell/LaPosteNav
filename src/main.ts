@@ -1,5 +1,5 @@
 import { loadState, reset, state } from './state';
-import { renderList, addVoie, initModal, initMoveModal, markGeoErrors } from './list';
+import { renderList, addVoie, initModal, initMoveModal, initGpsModal, markGeoErrors } from './list';
 import { geocodeVoie, type LatLng } from './geocode';
 import { computeRoute } from './route';
 import { initMap, showRoute, getMap } from './map';
@@ -197,6 +197,7 @@ async function init(): Promise<void> {
   renderList();
   initModal();
   initMoveModal();
+  initGpsModal();
   initSettings();
 
   document.getElementById('btn-add')!.addEventListener('click', addVoie);

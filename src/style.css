@@ -562,6 +562,158 @@ header h1 {
   display: inline;
 }
 
+/* ===== MANUAL GPS BADGE ===== */
+.manual-badge {
+  display: none;
+  font-size: 14px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.manual-badge--active {
+  display: inline;
+}
+
+/* ===== GPS BUTTON ===== */
+.btn-gps {
+  background: none;
+  border: none;
+  font-size: 16px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  flex-shrink: 0;
+  touch-action: manipulation;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  opacity: 0.35;
+}
+
+.btn-gps.has-coords {
+  opacity: 1;
+}
+
+.btn-gps:active {
+  background: #f0fdf4;
+}
+
+/* ===== GPS MODAL BODY ===== */
+.gps-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 16px;
+}
+
+.gps-modal-info {
+  font-size: 14px;
+  color: #555;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gps-current {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #15803d;
+  font-family: monospace;
+}
+
+.gps-btn-full {
+  width: 100%;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.gps-btn-full:active {
+  background: #1d4ed8;
+}
+
+.gps-btn-full:disabled {
+  background: #93c5fd;
+  cursor: default;
+}
+
+.gps-divider {
+  text-align: center;
+  color: #aaa;
+  font-size: 13px;
+  position: relative;
+}
+
+.gps-divider::before,
+.gps-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 30%;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+.gps-divider::before { left: 0; }
+.gps-divider::after { right: 0; }
+
+.gps-input {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 16px;
+  font-family: monospace;
+  outline: none;
+  background: #fff;
+  color: #1a1a1a;
+}
+
+.gps-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+}
+
+.gps-btn-clear {
+  background: none;
+  border: 1px solid #e04040;
+  color: #e04040;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+  min-height: 48px;
+  padding: 0 14px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  flex: none;
+}
+
+.gps-btn-clear:active {
+  background: #fde8e8;
+}
+
+.gps-btn-save {
+  background: #FFCD00;
+  color: #1a1a1a;
+}
+
+.gps-btn-save:active {
+  background: #e6b800;
+}
+
 /* ===== MAP MARKERS ===== */
 .map-marker {
   width: 26px;
