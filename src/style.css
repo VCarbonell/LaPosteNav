@@ -236,6 +236,26 @@ header h1 {
   border-color: #bbb;
 }
 
+.btn-duplicate {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 16px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  flex-shrink: 0;
+  touch-action: manipulation;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+
+.btn-duplicate:active {
+  background: #f0f0f0;
+}
+
 .btn-delete {
   background: none;
   border: none;
