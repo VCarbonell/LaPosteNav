@@ -367,7 +367,8 @@ header h1 {
   border-bottom: none;
 }
 
-.modal-voie input[type="checkbox"] {
+.modal-voie input[type="checkbox"],
+.modal-voie input[type="radio"] {
   width: 22px;
   height: 22px;
   accent-color: #333;
@@ -425,6 +426,15 @@ header h1 {
 }
 
 #modal-apply:active {
+  background: #e6b800;
+}
+
+#move-modal-apply {
+  background: #FFCD00;
+  color: #1a1a1a;
+}
+
+#move-modal-apply:active {
   background: #e6b800;
 }
 

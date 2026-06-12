@@ -46,6 +46,22 @@
       </div>
     </div>
 
+    <!-- ===== Modal déplacer une voie ===== -->
+    <div id="move-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Déplacer la voie">
+      <div class="modal-overlay" id="move-modal-overlay"></div>
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h2>Placer après…</h2>
+          <button id="move-modal-close" type="button" aria-label="Fermer">✕</button>
+        </div>
+        <p id="move-modal-info"></p>
+        <div class="modal-body" id="move-modal-list"></div>
+        <div class="modal-footer">
+          <button id="move-modal-apply" type="button">Déplacer</button>
+        </div>
+      </div>
+    </div>
+
     <!-- ===== Modal copie commune/CP ===== -->
     <div id="copy-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Appliquer commune et CP">
       <div class="modal-overlay" id="modal-overlay"></div>
