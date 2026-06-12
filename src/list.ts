@@ -110,6 +110,7 @@ function createItem(voie: Voie): HTMLLIElement {
           placeholder="Numéros"
           aria-label="Numéros"
         />
+        <button class="btn-duplicate" type="button" aria-label="Dupliquer cette voie">⧉</button>
         <button class="btn-delete" type="button" aria-label="Supprimer cette voie">✕</button>
       </div>
     </div>
@@ -154,6 +155,19 @@ function onListClick(e: Event): void {
   const target = e.target as HTMLElement;
   const li = target.closest<HTMLElement>('.voie-item');
   if (!li) return;
+
+  if (target.classList.contains('btn-duplicate')) {
+    const idx = state.voies.findIndex(v => v.id === li.dataset.id);
+    if (idx === -1) return;
+    const source = state.voies[idx];
+    const copy: Voie = { ...source, id: crypto.randomUUID(), geoError: undefined };
+    state.voies.splice(idx + 1, 0, copy);
+    save();
+    const newLi = createItem(copy);
+    li.after(newLi);
+    newLi.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    return;
+  }
 
   if (target.classList.contains('btn-delete')) {
     const voie = state.voies.find(v => v.id === li.dataset.id);
