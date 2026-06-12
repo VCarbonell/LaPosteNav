@@ -1,0 +1,21 @@
+{
+  "name": "lapostenav",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "idb-keyval": "^6.2.1",
+    "sortablejs": "^1.15.3"
+  },
+  "devDependencies": {
+    "@types/sortablejs": "^1.15.9",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.13"
+  }
+}
